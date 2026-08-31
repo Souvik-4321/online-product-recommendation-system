@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ product.name }} - ShopSmart
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- Navigation -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        🛍️ ShopSmart
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/#products">
+            Products
+        </a>
+
+    </div>
+
+</nav>
+
+
+<!-- Product Details -->
+
+<main>
+
+    <section class="details-container">
+
+
+        <!-- Product Image -->
+
+        <div class="details-image">
+
+            {% if product.category == "Smartphone" %}
+                📱
+            {% elif product.category == "Laptop" %}
+                💻
+            {% elif product.category == "Headphones" %}
+                🎧
+            {% elif product.category == "Keyboard" %}
+                ⌨️
+            {% elif product.category == "Mouse" %}
+                🖱️
+            {% elif product.category == "Tablet" %}
+                📲
+            {% else %}
+                🛍️
+            {% endif %}
+
+        </div>
+
+
+        <!-- Product Information -->
+
+        <div class="details-info">
+
+            <span class="category">
+
+                {{ product.category }}
+
+            </span>
+
+
+            <h1>
+
+                {{ product.name }}
+
+            </h1>
+
+
+            <p class="brand">
+
+                Brand:
+                <strong>
+                    {{ product.brand }}
+                </strong>
+
+            </p>
+
+
+            <div class="large-rating">
+
+                ⭐ {{ product.rating }}
+
+            </div>
+
+
+            <p class="description">
+
+                {{ product.description }}
+
+            </p>
+
+
+            <div class="large-price">
+
+                ₹{{ "{:,.0f}".format(product.price) }}
+
+            </div>
+
+
+            <button class="cart-button">
+
+                🛒 Add to Cart
+
+            </button>
+
+
+            <button class="wishlist-button">
+
+                ❤️ Add to Wishlist
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- Recommendations -->
+
+    <section
+        class="recommendation-section"
+        id="recommendations"
+    >
+
+        <div class="section-heading">
+
+            <h2>
+                You May Also Like
+            </h2>
+
+            <p>
+                Products similar to
+                <strong>{{ product.name }}</strong>
+            </p>
+
+        </div>
+
+
+        <div class="product-grid">
+
+            {% for item in recommendations %}
+
+            <div class="product-card">
+
+                <div class="product-image">
+
+                    {% if item.category == "Smartphone" %}
+                        📱
+                    {% elif item.category == "Laptop" %}
+                        💻
+                    {% elif item.category == "Headphones" %}
+                        🎧
+                    {% elif item.category == "Keyboard" %}
+                        ⌨️
+                    {% elif item.category == "Mouse" %}
+                        🖱️
+                    {% elif item.category == "Tablet" %}
+                        📲
+                    {% else %}
+                        🛍️
+                    {% endif %}
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <span class="category">
+
+                        {{ item.category }}
+
+                    </span>
+
+
+                    <h3>
+
+                        {{ item.name }}
+
+                    </h3>
+
+
+                    <p class="brand">
+
+                        {{ item.brand }}
+
+                    </p>
+
+
+                    <div class="rating">
+
+                        ⭐ {{ item.rating }}
+
+                    </div>
+
+
+                    <p class="similarity">
+
+                        AI Similarity:
+                        {{ item.similarity }}
+
+                    </p>
+
+
+                    <div class="product-bottom">
+
+                        <span class="price">
+
+                            ₹{{ "{:,.0f}".format(item.price) }}
+
+                        </span>
+
+
+                        <a
+                            href="/product/{{ item.id }}"
+                            class="view-button"
+                        >
+
+                            View
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- Footer -->
+
+<footer>
+
+    <h3>
+        🛍️ ShopSmart
+    </h3>
+
+    <p>
+        Machine Learning Based
+        Product Recommendation System
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

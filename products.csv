@@ -1,0 +1,16 @@
+id,name,category,brand,description,price,rating
+1,Samsung Galaxy S24,Smartphone,Samsung,5G smartphone AMOLED display 128GB,69999,4.5
+2,Samsung Galaxy S23,Smartphone,Samsung,5G smartphone AMOLED display 128GB,59999,4.4
+3,iPhone 15,Smartphone,Apple,5G smartphone OLED display 128GB,69999,4.6
+4,OnePlus 12,Smartphone,OnePlus,5G smartphone AMOLED display 256GB,64999,4.5
+5,Google Pixel 8,Smartphone,Google,5G smartphone OLED camera 128GB,59999,4.4
+6,HP Pavilion 15,Laptop,HP,Intel i5 laptop 8GB RAM SSD display,58999,4.3
+7,Dell Inspiron 15,Laptop,Dell,Intel i5 laptop 8GB RAM SSD display,56999,4.2
+8,Lenovo IdeaPad 3,Laptop,Lenovo,Intel i5 laptop 8GB RAM SSD display,54999,4.3
+9,Boat Rockerz 450,Headphones,Boat,Wireless Bluetooth headphones deep bass,1499,4.2
+10,Sony WH-1000XM5,Headphones,Sony,Wireless noise cancelling Bluetooth headphones,29999,4.7
+11,JBL Tune 760NC,Headphones,JBL,Wireless noise cancelling Bluetooth headphones,5999,4.4
+12,Logitech K380,Keyboard,Logitech,Wireless Bluetooth keyboard compact design,2999,4.5
+13,HP Wireless Mouse,Mouse,HP,Wireless optical mouse ergonomic design,799,4.2
+14,Logitech MX Master 3S,Mouse,Logitech,Wireless mouse ergonomic productivity,8999,4.7
+15,Apple iPad 10,Tablet,Apple,10 inch tablet powerful processor WiFi,39999,4.5
