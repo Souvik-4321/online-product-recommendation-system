@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Dashboard - ShopSmart
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+          filename='style.css') }}">
+
+</head>
+
+<body>
+
+
+<nav class="navbar">
+
+    <div class="logo">
+        🛍️ ShopSmart
+    </div>
+
+
+    <div class="nav-links">
+
+        <a href="/">
+            Home
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</nav>
+
+
+<main>
+
+    <section class="dashboard-header">
+
+        <h1>
+            Welcome, {{ user_name }} 👋
+        </h1>
+
+        <p>
+            Your personalized shopping dashboard
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <div class="section-heading">
+
+            <h2>
+                Recently Viewed
+            </h2>
+
+            <p>
+                Products you recently viewed
+            </p>
+
+        </div>
+
+
+        {% if recently_viewed %}
+
+        <div class="product-grid">
+
+            {% for product in recently_viewed %}
+
+            <div class="product-card">
+
+                <div class="product-image">
+
+                    {% if product.category
+                        == "Smartphone" %}
+
+                        📱
+
+                    {% elif product.category
+                        == "Laptop" %}
+
+                        💻
+
+                    {% elif product.category
+                        == "Headphones" %}
+
+                        🎧
+
+                    {% elif product.category
+                        == "Keyboard" %}
+
+                        ⌨️
+
+                    {% elif product.category
+                        == "Mouse" %}
+
+                        🖱️
+
+                    {% elif product.category
+                        == "Tablet" %}
+
+                        📲
+
+                    {% else %}
+
+                        🛍️
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="product-info">
+
+                    <span class="category">
+
+                        {{ product.category }}
+
+                    </span>
+
+
+                    <h3>
+                        {{ product.name }}
+                    </h3>
+
+
+                    <p class="brand">
+                        {{ product.brand }}
+                    </p>
+
+
+                    <div class="rating">
+
+                        ⭐ {{ product.rating }}
+
+                    </div>
+
+
+                    <div class="product-bottom">
+
+                        <span class="price">
+
+                            ₹{{ "{:,.0f}".format(
+                                product.price
+                            ) }}
+
+                        </span>
+
+
+                        <a
+                            href="/product/{{ product.id }}"
+                            class="view-button"
+                        >
+
+                            View
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="no-products">
+
+            <h3>
+                No recently viewed products
+            </h3>
+
+            <p>
+                Start exploring products!
+            </p>
+
+            <br>
+
+            <a
+                href="/"
+                class="view-button"
+            >
+
+                Explore Products
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <h3>
+        🛍️ ShopSmart
+    </h3>
+
+    <p>
+        Machine Learning Based
+        Product Recommendation System
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

@@ -28,17 +28,37 @@
 
     <div class="nav-links">
 
-        <a href="/">Home</a>
+    <a href="/">
+        Home
+    </a>
 
-        <a href="#products">
-            Products
+    <a href="#products">
+        Products
+    </a>
+
+    {% if session.get("user_id") %}
+
+        <a href="/dashboard">
+            Dashboard
         </a>
 
-        <a href="#recommendations">
-            Recommendations
+        <a href="/logout">
+            Logout
         </a>
 
-    </div>
+    {% else %}
+
+        <a href="/login">
+            Login
+        </a>
+
+        <a href="/register">
+            Register
+        </a>
+
+    {% endif %}
+
+</div>
 
 </nav>
 
