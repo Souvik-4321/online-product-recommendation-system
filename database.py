@@ -1,28 +1,27 @@
-import sqlite3
+import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
 
-
-DATABASE = "database.db"
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 
 def get_connection():
-    connection = sqlite3.connect(DATABASE)
+    if not DATABASE_URL:
+        raise Exception("DATABASE_URL is not set")
 
-    connection.row_factory = sqlite3.Row
-
-    return connection
+    return psycopg2.connect(DATABASE_URL)
 
 
 def create_tables():
 
     connection = get_connection()
-
     cursor = connection.cursor()
 
     # Users table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             name TEXT NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL,
@@ -46,7 +45,7 @@ def create_tables():
     # User activity table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS user_activity (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id SERIAL PRIMARY KEY,
             user_id INTEGER NOT NULL,
             product_id INTEGER NOT NULL,
             activity_type TEXT NOT NULL,
@@ -59,13 +58,13 @@ def create_tables():
 
     connection.commit()
 
+    cursor.close()
     connection.close()
 
 
 def add_user(name, email, password):
 
     connection = get_connection()
-
     cursor = connection.cursor()
 
     hashed_password = generate_password_hash(password)
@@ -75,19 +74,24 @@ def add_user(name, email, password):
         cursor.execute("""
             INSERT INTO users
             (name, email, password)
-            VALUES (?, ?, ?)
+            VALUES (%s, %s, %s)
+            RETURNING id
         """, (name, email, hashed_password))
+
+        user_id = cursor.fetchone()[0]
 
         connection.commit()
 
-        user_id = cursor.lastrowid
-
+        cursor.close()
         connection.close()
 
         return user_id
 
-    except sqlite3.IntegrityError:
+    except psycopg2.IntegrityError:
 
+        connection.rollback()
+
+        cursor.close()
         connection.close()
 
         return None
@@ -97,35 +101,46 @@ def get_user_by_email(email):
 
     connection = get_connection()
 
-    cursor = connection.cursor()
+    cursor = connection.cursor(
+        cursor_factory=RealDictCursor
+    )
 
     cursor.execute("""
         SELECT *
         FROM users
-        WHERE email = ?
+        WHERE email = %s
     """, (email,))
 
     user = cursor.fetchone()
 
+    cursor.close()
     connection.close()
 
     return user
 
 
-def add_activity(user_id, product_id, activity_type):
+def add_activity(
+    user_id,
+    product_id,
+    activity_type
+):
 
     connection = get_connection()
-
     cursor = connection.cursor()
 
     cursor.execute("""
         INSERT INTO user_activity
         (user_id, product_id, activity_type)
-        VALUES (?, ?, ?)
-    """, (user_id, product_id, activity_type))
+        VALUES (%s, %s, %s)
+    """, (
+        user_id,
+        product_id,
+        activity_type
+    ))
 
     connection.commit()
 
+    cursor.close()
     connection.close()
 
 
@@ -133,19 +148,23 @@ def get_recently_viewed(user_id):
 
     connection = get_connection()
 
-    cursor = connection.cursor()
+    cursor = connection.cursor(
+        cursor_factory=RealDictCursor
+    )
 
     cursor.execute("""
-        SELECT DISTINCT product_id
+        SELECT product_id, MAX(created_at) AS last_viewed
         FROM user_activity
-        WHERE user_id = ?
+        WHERE user_id = %s
         AND activity_type = 'view'
-        ORDER BY created_at DESC
+        GROUP BY product_id
+        ORDER BY last_viewed DESC
         LIMIT 5
     """, (user_id,))
 
     products = cursor.fetchall()
 
+    cursor.close()
     connection.close()
 
     return products

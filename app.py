@@ -21,7 +21,7 @@ from database import (
     get_user_by_email,
     add_activity,
     get_recently_viewed,
-    get_connection
+    
 )
 
 
