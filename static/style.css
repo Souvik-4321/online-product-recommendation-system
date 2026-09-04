@@ -542,6 +542,11 @@ main {
     margin-top: 70px;
 
 }
+.dashboard-header .view-button {
+    display: block;
+    width: fit-content;
+    margin: 30px auto 0;
+}
 
 
 .similarity {

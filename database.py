@@ -168,3 +168,53 @@ def get_recently_viewed(user_id):
     connection.close()
 
     return products
+
+def get_user_preferences(user_id):
+
+    connection = get_connection()
+
+    cursor = connection.cursor(
+        cursor_factory=RealDictCursor
+    )
+
+    cursor.execute("""
+        SELECT
+            p.category,
+            COUNT(*) AS category_count
+        FROM user_activity ua
+        JOIN products p
+        ON ua.product_id = p.id
+        WHERE ua.user_id = %s
+        AND ua.activity_type = 'view'
+        GROUP BY p.category
+        ORDER BY category_count DESC
+    """, (user_id,))
+
+    preferences = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return preferences
+def get_user_viewed_product_ids(user_id):
+
+    connection = get_connection()
+
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT DISTINCT product_id
+        FROM user_activity
+        WHERE user_id = %s
+        AND activity_type = 'view'
+    """, (user_id,))
+
+    product_ids = [
+        row[0]
+        for row in cursor.fetchall()
+    ]
+
+    cursor.close()
+    connection.close()
+
+    return product_ids

@@ -11,8 +11,10 @@ from flask import (
 from werkzeug.security import check_password_hash
 
 from recommendation import (
+    personalized_recommendations,
     products,
     recommend_products
+    
 )
 
 from database import (
@@ -21,6 +23,7 @@ from database import (
     get_user_by_email,
     add_activity,
     get_recently_viewed,
+    get_user_viewed_product_ids
     
 )
 
@@ -274,6 +277,41 @@ def product(product_id):
 
         product=selected_product,
 
+        recommendations=recommendations
+    )
+@app.route("/recommendations")
+def personalized():
+
+    if "user_id" not in session:
+
+        return redirect(
+            url_for("login")
+        )
+
+    user_id = session["user_id"]
+
+    # Get user's viewed products
+    viewed_product_ids = (
+        get_user_viewed_product_ids(
+            user_id
+        )
+    )
+
+    # Generate personalized recommendations
+    recommendations = personalized_recommendations(
+        viewed_product_ids,
+        products,
+        top_n=6
+    )
+
+    recommendations = [
+        product.to_dict()
+        for _, product
+        in recommendations.iterrows()
+    ]
+
+    return render_template(
+        "recommendations.html",
         recommendations=recommendations
     )
 
