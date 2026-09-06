@@ -218,3 +218,27 @@ def get_user_viewed_product_ids(user_id):
     connection.close()
 
     return product_ids
+
+def get_trending_products(limit=6):
+
+    connection = get_connection()
+
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
+
+    cursor.execute("""
+        SELECT
+            product_id,
+            COUNT(*) AS view_count
+        FROM user_activity
+        WHERE activity_type = 'view'
+        GROUP BY product_id
+        ORDER BY view_count DESC
+        LIMIT %s
+    """, (limit,))
+
+    trending_products = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return trending_products

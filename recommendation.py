@@ -80,83 +80,100 @@ if __name__ == "__main__":
             "Similarity:",
             product["similarity"]
         )
-def personalized_recommendations(
-    user_product_ids,
-    products,
-    top_n=6
-):
+def personalized_recommendations(user_product_ids, products, top_n=6):
 
     if not user_product_ids:
-        return products.head(top_n)
+        recommendations = products.head(top_n).copy()
 
-    # Products viewed by the user
+        recommendations["score"] = recommendations["rating"] * 0.5
+
+        recommendations["recommendation_reason"] = (
+            "Popular product with a good rating"
+        )
+
+        return recommendations
+
     viewed_products = products[
         products["id"].isin(user_product_ids)
     ]
 
     if viewed_products.empty:
-        return products.head(top_n)
+        recommendations = products.head(top_n).copy()
 
-    # Find most preferred category
-    category_counts = (
-        viewed_products["category"]
-        .value_counts()
-    )
+        recommendations["score"] = recommendations["rating"] * 0.5
 
-    preferred_category = (
-        category_counts.index[0]
-    )
+        recommendations["recommendation_reason"] = (
+            "Popular product with a good rating"
+        )
 
-    # Find most preferred brand
-    brand_counts = (
-        viewed_products["brand"]
-        .value_counts()
-    )
+        return recommendations
 
-    preferred_brand = (
-        brand_counts.index[0]
-    )
+    # Find preferred category
+    category_counts = viewed_products["category"].value_counts()
+    preferred_category = category_counts.index[0]
 
-    # Copy products
+    # Find preferred brand
+    brand_counts = viewed_products["brand"].value_counts()
+    preferred_brand = brand_counts.index[0]
+
     recommendations = products.copy()
 
-    # Don't recommend products already viewed
+    # Remove already viewed products
     recommendations = recommendations[
-        ~recommendations["id"].isin(
-            user_product_ids
-        )
+        ~recommendations["id"].isin(user_product_ids)
     ]
 
     # Create recommendation score
-    recommendations["score"] = 0
+    recommendations["score"] = 0.0
 
     # Category preference
     recommendations.loc[
-        recommendations["category"]
-        == preferred_category,
+        recommendations["category"] == preferred_category,
         "score"
     ] += 3
 
     # Brand preference
     recommendations.loc[
-        recommendations["brand"]
-        == preferred_brand,
+        recommendations["brand"] == preferred_brand,
         "score"
     ] += 2
 
     # Rating contribution
-    recommendations["score"] += (
-        recommendations["rating"] * 0.5
+    recommendations["score"] += recommendations["rating"] * 0.5
+
+    # Create explanation
+    def get_reason(row):
+
+        reasons = []
+
+        if row["category"] == preferred_category:
+            reasons.append(
+                f"you viewed {preferred_category} products"
+            )
+
+        if row["brand"] == preferred_brand:
+            reasons.append(
+                f"you showed interest in {preferred_brand}"
+            )
+
+        if row["rating"] >= 4.5:
+            reasons.append(
+                "it has a highly rated product"
+            )
+
+        if reasons:
+            return "Recommended because " + " and ".join(reasons)
+
+        return "Recommended based on your browsing activity"
+
+    recommendations["recommendation_reason"] = recommendations.apply(
+        get_reason,
+        axis=1
     )
 
-    # Sort by score
-    recommendations = (
-        recommendations
-        .sort_values(
-            by="score",
-            ascending=False
-        )
-        .head(top_n)
-    )
+    recommendations = recommendations.sort_values(
+        by="score",
+        ascending=False
+    ).head(top_n)
 
-    return recommendations       
+    return recommendations     

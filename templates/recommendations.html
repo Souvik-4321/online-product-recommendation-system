@@ -62,6 +62,74 @@
         </p>
 
     </section>
+    
+    <section class="insights-section">
+
+    <div class="section-heading">
+
+        <h2>
+            🧠 Your Recommendation Insights
+        </h2>
+
+        <p>
+            We use your browsing activity to personalize these products.
+        </p>
+
+    </div>
+
+    <div class="insights-grid">
+
+        <div class="insight-card">
+
+            <span class="insight-icon">
+                📂
+            </span>
+
+            <h3>
+                Preferred Category
+            </h3>
+
+            <p>
+                {{ preferred_category }}
+            </p>
+
+        </div>
+
+        <div class="insight-card">
+
+            <span class="insight-icon">
+                🏷️
+            </span>
+
+            <h3>
+                Preferred Brand
+            </h3>
+
+            <p>
+                {{ preferred_brand }}
+            </p>
+
+        </div>
+
+        <div class="insight-card">
+
+            <span class="insight-icon">
+                👀
+            </span>
+
+            <h3>
+                Products Viewed
+            </h3>
+
+            <p>
+                {{ viewed_count }}
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
 
 
     <section>
@@ -143,6 +211,15 @@
                         ⭐ {{ product.rating }}
 
                     </div>
+
+                    <p class="recommendation-reason">
+                    🧠{{ product.recommendation_reason }}
+                    </p>
+
+                    <p class="recommendation-score">
+                        🎯 Recommendation Score:
+                         {{ "%.1f"|format(product.score) }}
+                    </p>
 
 
                     <div class="product-bottom">

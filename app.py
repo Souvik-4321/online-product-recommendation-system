@@ -20,10 +20,12 @@ from recommendation import (
 from database import (
     create_tables,
     add_user,
+    get_trending_products,
     get_user_by_email,
     add_activity,
     get_recently_viewed,
-    get_user_viewed_product_ids
+    get_user_viewed_product_ids,
+    
     
 )
 
@@ -298,41 +300,76 @@ def product(product_id):
         recommendations=recommendations
     )
 @app.route("/recommendations")
-def personalized():
+def recommendations():
 
     if "user_id" not in session:
-
-        return redirect(
-            url_for("login")
-        )
+        return redirect(url_for("login"))
 
     user_id = session["user_id"]
 
-    # Get user's viewed products
-    viewed_product_ids = (
-        get_user_viewed_product_ids(
-            user_id
-        )
-    )
+    viewed_product_ids = get_user_viewed_product_ids(user_id)
 
-    # Generate personalized recommendations
-    recommendations = personalized_recommendations(
+    recommended_products = personalized_recommendations(
         viewed_product_ids,
         products,
         top_n=6
     )
 
-    recommendations = [
-        product.to_dict()
-        for _, product
-        in recommendations.iterrows()
+    viewed_products = products[
+        products["id"].isin(viewed_product_ids)
     ]
+
+    preferred_category = "Not enough data"
+    preferred_brand = "Not enough data"
+
+    if not viewed_products.empty:
+
+        category_counts = viewed_products["category"].value_counts()
+
+        if not category_counts.empty:
+            preferred_category = category_counts.index[0]
+
+        brand_counts = viewed_products["brand"].value_counts()
+
+        if not brand_counts.empty:
+            preferred_brand = brand_counts.index[0]
 
     return render_template(
         "recommendations.html",
-        recommendations=recommendations
+        recommendations=recommended_products.to_dict("records"),
+        preferred_category=preferred_category,
+        preferred_brand=preferred_brand,
+        viewed_count=len(viewed_product_ids)
     )
+# ==========================================
+# TRENDING PRODUCTS
+# ==========================================
 
+@app.route("/trending")
+def trending():
+
+    trending_ids = get_trending_products(limit=6)
+
+    trending_products = []
+
+    for row in trending_ids:
+
+        product = products[
+            products["id"] == row["product_id"]
+        ]
+
+        if not product.empty:
+
+            product_data = product.iloc[0].to_dict()
+
+            product_data["view_count"] = row["view_count"]
+
+            trending_products.append(product_data)
+
+    return render_template(
+        "trending.html",
+        trending_products=trending_products
+    )
 
 # ==========================================
 # RUN APPLICATION
