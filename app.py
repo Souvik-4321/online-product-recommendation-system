@@ -46,8 +46,10 @@ create_tables()
 def home():
 
     search = request.args.get("search", "")
-
     category = request.args.get("category", "")
+
+    min_price = request.args.get("min_price", "")
+    max_price = request.args.get("max_price", "")
 
     filtered_products = products.copy()
 
@@ -69,6 +71,18 @@ def home():
         filtered_products = filtered_products[
             filtered_products["category"] == category
         ]
+    # Minimum price filter
+    if min_price:
+
+        filtered_products = filtered_products[
+            filtered_products["price"] >= float(min_price)
+        ]
+    # Maximum price filter
+    if max_price:
+
+        filtered_products = filtered_products[
+            filtered_products["price"] <= float(max_price)
+        ]
 
     categories = sorted(
         products["category"].unique()
@@ -85,7 +99,11 @@ def home():
 
         search=search,
 
-        selected_category=category
+        selected_category=category,
+        
+        min_price=min_price,
+
+        max_price=max_price
     )
 
 
